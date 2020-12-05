@@ -1,0 +1,101 @@
+STEP-1 Getting Started :
+
+A: Sign-in To The AWS Console
+To begin, sign in to the AWS Console for the AWS account you will be using in this workshop.
+B: Select A Region
+This web application can be deployed in any AWS region that supports all the services used in this application. Refer to the region table to see which regions have the supported services. The supported regions include:
+
+us-east-1 (N. Virginia)
+us-east-2 (Ohio)
+us-west-2 (Oregon)
+eu-west-1 (Ireland)
+Select a region from the dropdown in the upper right corner of the AWS Management Console.
+
+ Step-2 Create your Mythical Mysfit IDE
+ 
+ A: Create A New AWS Cloud9 Environment
+ 
+ On the AWS Console home page, type Cloud9 into the service search bar and select it:
+ Click Create Environment on the Cloud9 home page:
+ Name your environment MythicalMysfitsIDE with any description you'd like, and click Next Step:
+ Leave the Environment settings as their defaults and click Next Step:
+ Click Create Environment:
+ When the IDE has finished being created for you, you'll be presented with a welcome screen that looks like this:
+ 
+ B: Clone The Mythical Mysfits Workshop Repository
+ 
+In the bottom panel, you will see a terminal command line open and ready to use. Run the following git command in the terminal to clone the necessary code to complete thIS STEP
+
+
+                 git clone -b python https://github.com/aws-samples/aws-modern-application-workshop.git
+
+
+In the terminal, change directory to the newly cloned repository directory:
+
+
+                 cd aws-modern-application-workshop
+
+STEP-3 : HOST THE WEBSITE ON S3
+
+A: Create An S3 Bucket And Configure It For Website Hosting
+
+Next, we will create the infrastructure components needed for hosting a static website in Amazon S3 via the AWS CLI.
+
+First, you'll create an S3 bucket and replace the name below (mythical-mysfits-bucket-name) with your own unique bucket name.
+Note: please see the requirements for bucket names
+
+
+                 aws s3 mb s3://REPLACE_ME_BUCKET_NAME
+                 
+ Now that we have created a bucket, we need to set some configuration options that enable the bucket to be used for static website hosting. 
+ This configuration enables the objects in the bucket to be requested using a registered public DNS name for the bucket, 
+ as well as direct site requests to the base path of the DNS name to a selected website homepage (index.html in most cases): 
+ 
+ 
+                 aws s3 website s3://REPLACE_ME_BUCKET_NAME --index-document index.html
+                 
+                 
+  B: Update The S3 Bucket Policy
+  
+All buckets created in Amazon S3 are fully private by default. In order to be used as a public website, we need to create an S3 Bucket Policy that indicates objects stored within
+this new bucket may be publicly accessed by anyone. Bucket policies are represented as JSON documents that define the S3 Actions (S3 API calls) that are allowed (or not not allowed) to be performed by different Principals (in our case the public, or anyone).
+
+The JSON document for the necessary bucket policy is located at: ~/environment/aws-modern-application-workshop/module-1/aws-cli/website-bucket-policy.json. This file contains a string that needs to be replaced with the bucket name you've chosen (indicated with REPLACE_ME_BUCKET_NAME).
+
+Note: Throughout this workshop you will be similarly opening files that have contents which need to be replaced (all will be prefixed with REPLACE_ME_, to make them easy to find using CTRL-F on Windows or ⌘-F on Mac.) 
+
+To open a file in Cloud9, use the File Explorer on the left panel and double click website-bucket-policy.json:   
+
+
+This will open bucket-policy.json in the File Editor panel. Replace the string shown with your chosen bucket name used in the previous commands:
+
+
+Execute the following CLI command to add a public bucket policy to your website:
+
+
+     aws s3api put-bucket-policy --bucket REPLACE_ME_BUCKET_NAME --policy file://~/environment/aws-modern-application-workshop/module-1/aws-cli/website-bucket-policy.json
+
+
+Now that our new website bucket is configured appropriately, let's add the first iteration of the Mythical Mysfits homepage to the bucket. Use the following S3 CLI command that mimics the linux command for copying files (cp) to copy the provided index.html page locally from your IDE up to the new S3 bucket (replacing the bucket name appropriately).
+ 
+ 
+         aws s3 cp ~/environment/aws-modern-application-workshop/module-1/web/index.html s3://REPLACE_ME_BUCKET_NAME/index.html
+         
+Now, open up your favorite web browser and enter one of the below URIs into the address bar. 
+One of the below URIs contains a '.' before the region name, and the other a '-'. Which you should use depends on the region you're using.
+
+The string to replace REPLACE_ME_YOUR_REGION should match whichever region you created the S3 bucket within (eg: us-east-1):
+
+For us-east-1 (N. Virginia), us-west-2 (Oregon), eu-west-1 (Ireland) use:
+
+              http://REPLACE_ME_BUCKET_NAME.s3-website-REPLACE_ME_YOUR_REGION.amazonaws.com
+
+For us-east-2 (Ohio) use:
+
+              http://REPLACE_ME_BUCKET_NAME.s3-website.REPLACE_ME_YOUR_REGION.amazonaws.com
+
+Congratulations, you have created the basic static Mythical Mysfits Website!
+
+
+                 
+                 
